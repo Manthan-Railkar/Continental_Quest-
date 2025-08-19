@@ -1,0 +1,270 @@
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continental Quest - Embark on Your Galactic Journey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated Stars Background -->
+    <div class="stars-container">
+        <div class="stars-layer stars-layer-1"></div>
+        <div class="stars-layer stars-layer-2"></div>
+        <div class="stars-layer stars-layer-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🌍</span>
+                <span class="logo-text">Continental Quest</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#leaderboard" class="nav-link">Leaderboard</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="nav-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="title-main">Continental</span>
+                <span class="title-accent">Quest</span>
+            </h1>
+            <p class="hero-subtitle">Embark on an epic journey across Earth's continents in this galactic adventure</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" id="startGameBtn">
+                    <span>🚀</span>
+                    Start Your Quest
+                </button>
+                <button class="btn btn-secondary" id="learnMoreBtn">
+                    <span>🌟</span>
+                    Learn More
+                </button>
+            </div>
+        </div>
+        
+        <!-- Floating Earth Globe -->
+        <div class="earth-container">
+            <div class="earth-orbit">
+                <div class="earth-globe" id="earthGlobe">
+                    <div class="earth-surface">
+                        <!-- Continent Hotspots -->
+                        <div class="continent-hotspot" data-continent="north-america" style="top: 30%; left: 25%;">
+                            <div class="hotspot-pulse"></div>
+                            <div class="hotspot-label">North America</div>
+                        </div>
+                        <div class="continent-hotspot" data-continent="south-america" style="top: 55%; left: 30%;">
+                            <div class="hotspot-pulse"></div>
+                            <div class="hotspot-label">South America</div>
+                        </div>
+                        <div class="continent-hotspot" data-continent="europe" style="top: 25%; left: 55%;">
+                            <div class="hotspot-pulse"></div>
+                            <div class="hotspot-label">Europe</div>
+                        </div>
+                        <div class="continent-hotspot" data-continent="africa" style="top: 45%; left: 52%;">
+                            <div class="hotspot-pulse"></div>
+                            <div class="hotspot-label">Africa</div>
+                        </div>
+                        <div class="continent-hotspot" data-continent="asia" style="top: 30%; left: 70%;">
+                            <div class="hotspot-pulse"></div>
+                            <div class="hotspot-label">Asia</div>
+                        </div>
+                        <div class="continent-hotspot" data-continent="australia" style="top: 65%; left: 75%;">
+                            <div class="hotspot-pulse"></div>
+                            <div class="hotspot-label">Australia</div>
+                        </div>
+                        <div class="continent-hotspot" data-continent="antarctica" style="top: 85%; left: 50%;">
+                            <div class="hotspot-pulse"></div>
+                            <div class="hotspot-label">Antarctica</div>
+                        </div>
+                    </div>
+                    <div class="earth-glow"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Continent Selection Section -->
+    <section class="continent-selection" id="continents">
+        <div class="container">
+            <h2 class="section-title">Choose Your Destination</h2>
+            <p class="section-subtitle">Each continent offers unique challenges and adventures</p>
+            
+            <div class="continent-grid">
+                <div class="continent-card" data-difficulty="easy">
+                    <div class="card-header">
+                        <span class="continent-icon">🏔️</span>
+                        <h3>North America</h3>
+                        <div class="difficulty-badge difficulty-easy">Easy</div>
+                    </div>
+                    <div class="card-content">
+                        <p>Start your journey in the diverse landscapes of North America</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <button class="continent-btn">Explore</button>
+                    </div>
+                </div>
+
+                <div class="continent-card" data-difficulty="easy">
+                    <div class="card-header">
+                        <span class="continent-icon">🌴</span>
+                        <h3>Australia</h3>
+                        <div class="difficulty-badge difficulty-easy">Easy</div>
+                    </div>
+                    <div class="card-content">
+                        <p>Discover the unique wildlife and outback adventures</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <button class="continent-btn">Explore</button>
+                    </div>
+                </div>
+
+                <div class="continent-card" data-difficulty="medium">
+                    <div class="card-header">
+                        <span class="continent-icon">🏛️</span>
+                        <h3>Europe</h3>
+                        <div class="difficulty-badge difficulty-medium">Medium</div>
+                    </div>
+                    <div class="card-content">
+                        <p>Navigate through ancient history and modern marvels</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <button class="continent-btn">Explore</button>
+                    </div>
+                </div>
+
+                <div class="continent-card" data-difficulty="medium">
+                    <div class="card-header">
+                        <span class="continent-icon">🌺</span>
+                        <h3>South America</h3>
+                        <div class="difficulty-badge difficulty-medium">Medium</div>
+                    </div>
+                    <div class="card-content">
+                        <p>Journey through rainforests and ancient civilizations</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <button class="continent-btn">Explore</button>
+                    </div>
+                </div>
+
+                <div class="continent-card" data-difficulty="hard">
+                    <div class="card-header">
+                        <span class="continent-icon">🏯</span>
+                        <h3>Asia</h3>
+                        <div class="difficulty-badge difficulty-hard">Hard</div>
+                    </div>
+                    <div class="card-content">
+                        <p>Master the diverse cultures and challenging terrains</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <button class="continent-btn">Explore</button>
+                    </div>
+                </div>
+
+                <div class="continent-card" data-difficulty="hard">
+                    <div class="card-header">
+                        <span class="continent-icon">🦁</span>
+                        <h3>Africa</h3>
+                        <div class="difficulty-badge difficulty-hard">Hard</div>
+                    </div>
+                    <div class="card-content">
+                        <p>Brave the wild savannas and ancient mysteries</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <button class="continent-btn">Explore</button>
+                    </div>
+                </div>
+
+                <div class="continent-card" data-difficulty="extreme">
+                    <div class="card-header">
+                        <span class="continent-icon">🧊</span>
+                        <h3>Antarctica</h3>
+                        <div class="difficulty-badge difficulty-extreme">Extreme</div>
+                    </div>
+                    <div class="card-content">
+                        <p>Survive the ultimate frozen frontier challenge</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <button class="continent-btn">Explore</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="about">
+        <div class="container">
+            <h2 class="section-title">Game Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Interactive Earth</h3>
+                    <p>Navigate through a beautifully rendered 3D Earth with realistic continent representations</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Dynamic Difficulty</h3>
+                    <p>Experience adaptive challenges based on real geographical and cultural complexities</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎮</div>
+                    <h3>Immersive Gameplay</h3>
+                    <p>Engage with interactive puzzles and challenges unique to each continent</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3>Achievement System</h3>
+                    <p>Unlock achievements and track your progress across all seven continents</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="logo-icon">🌍</span>
+                    <span class="logo-text">Continental Quest</span>
+                </div>
+                <p>&copy; 2024 Continental Quest. Ready to explore the galaxy through Earth's continents?</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Game Start Modal -->
+    <div class="modal" id="gameModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Welcome, Space Explorer!</h2>
+            <p>Choose your starting continent to begin your galactic journey through Earth.</p>
+            <div class="modal-buttons">
+                <button class="btn btn-primary">Begin Adventure</button>
+                <button class="btn btn-secondary">Select Difficulty</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
