@@ -336,7 +336,21 @@ def run_quantum_transition(continent_name):
     # Initialize pygame if not already done
     if not pygame_initialized:
         pygame.init()
+        pygame.mixer.init()
         pygame_initialized = True
+    
+    # Load and play background music
+    music_path = Path("final.mp3")
+    if music_path.exists():
+        try:
+            pygame.mixer.music.load(str(music_path))
+            pygame.mixer.music.play(-1)  # -1 means loop indefinitely
+            pygame.mixer.music.set_volume(0.7)  # Set volume to 70%
+            print("🎵 Background music started (final.mp3)")
+        except Exception as e:
+            print(f"⚠️ Could not load background music: {e}")
+    else:
+        print("⚠️ final.mp3 not found in current directory")
     
     # Get screen dimensions
     info = pygame.display.Info()
@@ -466,6 +480,8 @@ def run_quantum_transition(continent_name):
         
         pygame.display.flip()
     
+    # Don't stop the music when quantum transition ends - it should continue
+    # pygame.mixer.music.stop()  # Commented out so music continues
     pygame.quit()
     return True
 
@@ -482,6 +498,7 @@ class ContinentalQuestApp:
         self.game_running = False
         self.web_window = None
         self.game_process = None
+        self.music_started = False
         
         # Paths
         self.app_dir = Path(__file__).parent
@@ -489,6 +506,41 @@ class ContinentalQuestApp:
         
         print("🌍 Continental Quest - Starting Application")
         print(f"📁 App Directory: {self.app_dir}")
+        
+    def start_background_music(self):
+        """Start the background music if not already playing"""
+        if not self.music_started:
+            try:
+                # Initialize pygame mixer if not already done
+                import pygame
+                if not pygame.get_init():
+                    pygame.init()
+                if not pygame.mixer.get_init():
+                    pygame.mixer.init()
+                
+                music_path = Path("final.mp3")
+                if music_path.exists():
+                    pygame.mixer.music.load(str(music_path))
+                    pygame.mixer.music.play(-1)  # Loop indefinitely
+                    pygame.mixer.music.set_volume(0.7)
+                    self.music_started = True
+                    print("🎵 Background music started (final.mp3)")
+                else:
+                    print("⚠️ final.mp3 not found in current directory")
+            except Exception as e:
+                print(f"⚠️ Could not start background music: {e}")
+    
+    def stop_background_music(self):
+        """Stop the background music"""
+        if self.music_started:
+            try:
+                import pygame
+                if pygame.mixer.get_init():
+                    pygame.mixer.music.stop()
+                    self.music_started = False
+                    print("🎵 Background music stopped")
+            except Exception as e:
+                print(f"⚠️ Could not stop background music: {e}")
         
     def setup_api_bridge(self):
         """Setup JavaScript-Python communication bridge"""
@@ -521,6 +573,9 @@ class ContinentalQuestApp:
                 self.app.current_difficulty = difficulty
                 
                 print(f"🎮 Starting 3D Globe: {continent} ({difficulty})")
+                
+                # Start background music first
+                self.app.start_background_music()
                 
                 # Run the quantum transition first
                 print("🚀 Starting quantum space jump transition...")
@@ -658,6 +713,9 @@ class ContinentalQuestApp:
             print("❌ pywebview is not available")
             return False
         
+        # Start background music when launcher starts
+        self.start_background_music()
+        
         # Ensure launcher files are available
         self.create_launcher_files()
         
@@ -726,20 +784,33 @@ class ContinentalQuestApp:
             except Exception as e:
                 print(f"❌ [DEBUG] Failed to enhance integration: {e}")
         
-        # Set the callback
+        # Handle window closing to stop music
+        def on_window_closing():
+            print("🔄 Window closing - stopping background music")
+            self.stop_background_music()
+        
+        # Set the callbacks
         webview.windows[0].events.loaded += on_window_loaded
+        webview.windows[0].events.closing += on_window_closing
         
         print("🚀 Starting Continental Quest Launcher...")
         print("🌍 Use the web interface to select your continent!")
         
         # Start the webview (this blocks until window closes)
-        webview.start(debug=True)
+        try:
+            webview.start(debug=True)
+        finally:
+            # Ensure music is stopped when webview ends
+            self.stop_background_music()
         
         return True
     
     def run_fallback_launcher(self):
         """Fallback method using system browser"""
         print("🔄 Using fallback browser launcher...")
+        
+        # Start background music for fallback mode too
+        self.start_background_music()
         
         self.create_launcher_files()
         
@@ -755,12 +826,16 @@ class ContinentalQuestApp:
                     time.sleep(1)
             except KeyboardInterrupt:
                 print("👋 Application closed")
+                self.stop_background_music()
         else:
             print("❌ Launcher files not found")
     
     def shutdown(self):
         """Clean shutdown of the application"""
         print("🛑 Shutting down Continental Quest...")
+        
+        # Stop background music
+        self.stop_background_music()
         
         if self.web_window:
             try:
