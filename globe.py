@@ -280,6 +280,15 @@ def main():
         pygame.display.set_mode(display, DOUBLEBUF | OPENGL | RESIZABLE)
         pygame.display.set_caption('Continental Quest - Realistic Earth with Enhanced Space Background')
         pygame.key.set_repeat(1, 10)
+        
+        # Initialize pygame mixer and load the sound
+        pygame.mixer.init()
+        try:
+            pygame.mixer.music.load('space_sound.mp3')
+            pygame.mixer.music.play(-1)  # -1 means loop indefinitely
+            print("Playing space_sound.mp3 on loop")
+        except Exception as e:
+            print(f"Could not load or play space_sound.mp3: {e}")
 
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_TEXTURE_2D)
@@ -417,4 +426,4 @@ def main():
         pygame.quit()
 
 if __name__ == '__main__':
-    main() 
+    main()
