@@ -522,6 +522,12 @@ class ContinentalQuestApp:
                 if not pygame.mixer.get_init():
                     pygame.mixer.init()
                 
+                # Check if music is already playing (from another part of the app)
+                if pygame.mixer.music.get_busy():
+                    print("🎵 Music already playing from another source")
+                    self.music_started = True
+                    return
+                
                 music_path = Path("final.mp3")
                 if music_path.exists():
                     pygame.mixer.music.load(str(music_path))
@@ -533,6 +539,8 @@ class ContinentalQuestApp:
                     print("⚠️ final.mp3 not found in current directory")
             except Exception as e:
                 print(f"⚠️ Could not start background music: {e}")
+        else:
+            print("🎵 Background music already started, continuing...")
     
     def stop_background_music(self):
         """Stop the background music"""
@@ -578,8 +586,11 @@ class ContinentalQuestApp:
                 
                 print(f"🎮 Starting 3D Globe: {continent} ({difficulty})")
                 
-                # Start background music first
-                self.app.start_background_music()
+                # Start background music only if not already playing
+                if not self.app.music_started:
+                    self.app.start_background_music()
+                else:
+                    print("🎵 Music already playing, continuing without restart")
                 
                 # Run the quantum transition first
                 print("🚀 Starting quantum space jump transition...")
@@ -650,6 +661,23 @@ class ContinentalQuestApp:
             
             print(f"🌍 Starting 3D Globe for: {continent}")
             
+            # Ensure music is playing before starting globe
+            import pygame
+            if self.music_started and pygame.mixer.get_init():
+                if not pygame.mixer.music.get_busy():
+                    print("🎵 Music not playing, restarting before globe...")
+                    music_path = Path("final.mp3")
+                    if music_path.exists():
+                        try:
+                            pygame.mixer.music.load(str(music_path))
+                            pygame.mixer.music.play(-1)
+                            pygame.mixer.music.set_volume(0.7)
+                            print("🎵 Music restarted before globe")
+                        except Exception as e:
+                            print(f"⚠️ Could not restart music: {e}")
+                else:
+                    print("🎵 Music playing, continuing to globe...")
+            
             # Start the 3D globe in a separate thread to avoid blocking
             globe_thread = threading.Thread(
                 target=self.run_globe_with_continent,
@@ -677,6 +705,35 @@ class ContinentalQuestApp:
             self.game_running = True
             print(f"🎮 3D Globe running for: {continent}")
             
+            # Ensure music continues playing by checking and restarting if needed
+            import pygame
+            if pygame.mixer.get_init() and not pygame.mixer.music.get_busy():
+                print("🎵 Music stopped, restarting for globe...")
+                music_path = Path("final.mp3")
+                if music_path.exists():
+                    try:
+                        pygame.mixer.music.load(str(music_path))
+                        pygame.mixer.music.play(-1)
+                        pygame.mixer.music.set_volume(0.7)
+                        print("🎵 Music restarted for globe")
+                    except Exception as e:
+                        print(f"⚠️ Could not restart music for globe: {e}")
+            else:
+                print("🎵 Music continuing into globe...")
+            
+            # Store original pygame mixer state before running globe
+            music_was_playing = False
+            music_position = 0
+            
+            try:
+                if pygame.mixer.get_init():
+                    music_was_playing = pygame.mixer.music.get_busy()
+                    # Save current music state
+                    if music_was_playing:
+                        print("🎵 Preserving music state for globe execution")
+            except:
+                pass
+            
             # You can modify globe.py's main() function or create continent-specific versions
             # For now, we'll run the existing globe
             globe.main()
@@ -685,6 +742,21 @@ class ContinentalQuestApp:
             print(f"❌ Globe error: {e}")
         finally:
             self.game_running = False
+            
+            # Restore music after globe closes if it was interrupted
+            try:
+                import pygame
+                if pygame.mixer.get_init() and not pygame.mixer.music.get_busy() and self.music_started:
+                    print("🎵 Restoring music after globe closed...")
+                    music_path = Path("final.mp3")
+                    if music_path.exists():
+                        pygame.mixer.music.load(str(music_path))
+                        pygame.mixer.music.play(-1)
+                        pygame.mixer.music.set_volume(0.7)
+                        print("🎵 Music restored after globe")
+            except Exception as e:
+                print(f"⚠️ Could not restore music after globe: {e}")
+                
             # Restore the launcher window when globe closes
             if self.web_window:
                 self.web_window.show()
