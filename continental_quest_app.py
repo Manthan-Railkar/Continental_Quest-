@@ -339,18 +339,22 @@ def run_quantum_transition(continent_name):
         pygame.mixer.init()
         pygame_initialized = True
     
-    # Load and play background music
-    music_path = Path("final.mp3")
-    if music_path.exists():
-        try:
-            pygame.mixer.music.load(str(music_path))
-            pygame.mixer.music.play(-1)  # -1 means loop indefinitely
-            pygame.mixer.music.set_volume(0.7)  # Set volume to 70%
-            print("🎵 Background music started (final.mp3)")
-        except Exception as e:
-            print(f"⚠️ Could not load background music: {e}")
+    # Don't restart music here - it should already be playing from the launcher
+    # Just check if music is already playing, if not, start it
+    if not pygame.mixer.music.get_busy():
+        music_path = Path("final.mp3")
+        if music_path.exists():
+            try:
+                pygame.mixer.music.load(str(music_path))
+                pygame.mixer.music.play(-1)  # -1 means loop indefinitely
+                pygame.mixer.music.set_volume(0.7)  # Set volume to 70%
+                print("🎵 Background music started in transition (final.mp3)")
+            except Exception as e:
+                print(f"⚠️ Could not load background music: {e}")
+        else:
+            print("⚠️ final.mp3 not found in current directory")
     else:
-        print("⚠️ final.mp3 not found in current directory")
+        print("🎵 Music already playing, continuing...")
     
     # Get screen dimensions
     info = pygame.display.Info()
