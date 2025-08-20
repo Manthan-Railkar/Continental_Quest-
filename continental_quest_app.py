@@ -874,7 +874,7 @@ class ContinentalQuestApp:
         
         # Start the webview (this blocks until window closes)
         try:
-            webview.start(debug=True)
+            webview.start(debug=False)  # Changed from debug=True to debug=False
         finally:
             # Ensure music is stopped when webview ends
             self.stop_background_music()
