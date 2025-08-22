@@ -248,7 +248,7 @@ def draw_nebula():
         size_val = random.uniform(2, 5)
         glBegin(GL_QUADS)
         glVertex3f(-size_val, -size_val, 0)
-        glVertex3f( size_val, -size_val, 0)
+        glVertex3f( size_val, -size_val, 0) 
         glVertex3f( size_val,  size_val, 0)
         glVertex3f(-size_val,  size_val, 0)
         glEnd()
