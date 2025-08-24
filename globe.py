@@ -7,6 +7,8 @@ from OpenGL.GLU import *
 import numpy as np
 import random
 import os
+import subprocess
+import sys
 
 # ------------------ Texture helpers ------------------
 
@@ -105,6 +107,112 @@ def create_galaxy_texture():
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size, size, 0, GL_RGB, GL_UNSIGNED_BYTE, texture_data)
     glBindTexture(GL_TEXTURE_2D, 0)
     return tex_id
+
+# ------------------ Continent markers ------------------
+
+class ContinentMarker:
+    def __init__(self, lat, lon, color, size=0.15, game_file=None, name=None):
+        self.lat = lat  # Latitude in degrees
+        self.lon = lon  # Longitude in degrees
+        self.color = color
+        self.size = size
+        self.game_file = game_file
+        self.name = name
+        self.hover = False
+        self.selected = False
+        
+    def get_3d_position(self, radius):
+        # Convert latitude and longitude to 3D coordinates
+        # Note: In the Earth coordinate system:
+        # - Latitude: -90 (South Pole) to 90 (North Pole)
+        # - Longitude: -180 to 180, with 0 at Prime Meridian
+        phi = math.radians(90 - self.lat)  # Convert to polar angle (0 at North Pole)
+        theta = math.radians(self.lon)
+        
+        x = radius * math.sin(phi) * math.cos(theta)
+        y = radius * math.sin(phi) * math.sin(theta)
+        z = radius * math.cos(phi)
+        
+        return (x, y, z)
+    
+    def draw(self, radius):
+        x, y, z = self.get_3d_position(radius)
+        
+        glPushMatrix()
+        glTranslatef(x, y, z)
+        
+        # Calculate normal vector for proper orientation
+        normal = [x/radius, y/radius, z/radius]
+        glNormal3f(normal[0], normal[1], normal[2])
+        
+        # Draw the marker as a small pyramid
+        if self.selected:
+            glColor3f(1.0, 1.0, 0.0)  # Yellow when selected
+            marker_size = self.size * 1.5
+        elif self.hover:
+            glColor3f(1.0, 0.5, 0.0)  # Orange when hovered
+            marker_size = self.size * 1.3
+        else:
+            glColor3f(*self.color)
+            marker_size = self.size
+            
+        glDisable(GL_LIGHTING)
+        
+        # Draw a pyramid pointing outward from the Earth's surface
+        glBegin(GL_TRIANGLES)
+        # Base
+        glVertex3f(-marker_size, -marker_size, 0)
+        glVertex3f(marker_size, -marker_size, 0)
+        glVertex3f(marker_size, marker_size, 0)
+        
+        glVertex3f(-marker_size, -marker_size, 0)
+        glVertex3f(marker_size, marker_size, 0)
+        glVertex3f(-marker_size, marker_size, 0)
+        
+        # Sides
+        glVertex3f(-marker_size, -marker_size, 0)
+        glVertex3f(marker_size, -marker_size, 0)
+        glVertex3f(0, 0, marker_size * 2)
+        
+        glVertex3f(marker_size, -marker_size, 0)
+        glVertex3f(marker_size, marker_size, 0)
+        glVertex3f(0, 0, marker_size * 2)
+        
+        glVertex3f(marker_size, marker_size, 0)
+        glVertex3f(-marker_size, marker_size, 0)
+        glVertex3f(0, 0, marker_size * 2)
+        
+        glVertex3f(-marker_size, marker_size, 0)
+        glVertex3f(-marker_size, -marker_size, 0)
+        glVertex3f(0, 0, marker_size * 2)
+        glEnd()
+        
+        # Add a highlight
+        glColor3f(1.0, 1.0, 1.0)
+        glBegin(GL_LINE_LOOP)
+        glVertex3f(-marker_size, -marker_size, 0)
+        glVertex3f(marker_size, -marker_size, 0)
+        glVertex3f(marker_size, marker_size, 0)
+        glVertex3f(-marker_size, marker_size, 0)
+        glEnd()
+        
+        glEnable(GL_LIGHTING)
+        glPopMatrix()
+    
+    def check_click(self, radius, mouse_pos, viewport, modelview, projection):
+        # Get the 3D position of the marker
+        x, y, z = self.get_3d_position(radius)
+        
+        # Project the 3D point to 2D screen coordinates
+        win_x, win_y, win_z = gluProject(x, y, z, modelview, projection, viewport)
+        
+        # Calculate distance between mouse and marker in screen space
+        dx = mouse_pos[0] - win_x
+        dy = (viewport[3] - mouse_pos[1]) - win_y  # Flip y coordinate
+        distance = math.sqrt(dx*dx + dy*dy)
+        
+        # Check if the click is within the marker's radius (converted to screen space)
+        return distance < 20  # 20 pixels threshold
 
 # ------------------ Scene helpers ------------------
 
@@ -331,6 +439,17 @@ def main():
         earth_material_specular = [0.1, 0.1, 0.1, 1.0]
         earth_material_shininess = [5.0]
 
+        # Create continent markers with more accurate positions
+        continent_markers = [
+            ContinentMarker(34.0479, 100.6197, (1.0, 0.0, 0.0), 0.15, "asia_game.py", "Asia"),  # Asia (Central)
+            ContinentMarker(1.0, 18.0, (0.0, 1.0, 0.0), 0.15, "africa_game.py", "Africa"),  # Africa (Central)
+            ContinentMarker(50.0, 10.0, (0.0, 0.0, 1.0), 0.15, "europe_game.py", "Europe"),  # Europe (Central)
+            ContinentMarker(45.0, -100.0, (1.0, 0.5, 0.0), 0.15, "northamerica_game.py", "North America"),  # North America (Central)
+            ContinentMarker(-20.0, -60.0, (0.5, 0.0, 1.0), 0.15, "southamerica_game.py", "South America"),  # South America (Central)
+            ContinentMarker(-25.0, 135.0, (1.0, 0.0, 1.0), 0.15, "australia_game.py", "Australia"),  # Australia (Central)
+            ContinentMarker(-82.0, 0.0, (0.0, 1.0, 1.0), 0.15, "antarctica_game.py", "Antarctica")  # Antarctica
+        ]
+
         start_time = time.time()
         lastPosX, lastPosY = 0, 0
         rotating = False
@@ -339,6 +458,7 @@ def main():
         print("Arrow keys / Left-drag: rotate Earth")
         print("Mouse wheel: zoom")
         print("L: toggle lighting, ESC: quit")
+        print("Click on continent markers to launch games")
 
         running = True
         while running:
@@ -368,6 +488,25 @@ def main():
                 elif event.type == MOUSEBUTTONDOWN:
                     if event.button == 1:
                         rotating = True
+                        
+                        # Check if a marker was clicked
+                        viewport = glGetIntegerv(GL_VIEWPORT)
+                        modelview = glGetDoublev(GL_MODELVIEW_MATRIX)
+                        projection = glGetDoublev(GL_PROJECTION_MATRIX)
+                        
+                        for marker in continent_markers:
+                            if marker.check_click(2.5, event.pos, viewport, modelview, projection):
+                                marker.selected = True
+                                print(f"Launching {marker.game_file}...")
+                                
+                                # Launch the game in a new process
+                                try:
+                                    # Keep music playing by not terminating the mixer
+                                    subprocess.Popen([sys.executable, marker.game_file])
+                                except Exception as e:
+                                    print(f"Failed to launch {marker.game_file}: {e}")
+                            else:
+                                marker.selected = False
                     elif event.button == 4:
                         glScaled(1.05, 1.05, 1.05)
                     elif event.button == 5:
@@ -383,6 +522,14 @@ def main():
                     glRotatef(dy * 0.3, 1, 0, 0)
                     glRotatef(dx * 0.3, 0, 1, 0)
                     lastPosX, lastPosY = x, y
+                    
+                    # Check for marker hover
+                    viewport = glGetIntegerv(GL_VIEWPORT)
+                    modelview = glGetDoublev(GL_MODELVIEW_MATRIX)
+                    projection = glGetDoublev(GL_PROJECTION_MATRIX)
+                    
+                    for marker in continent_markers:
+                        marker.hover = marker.check_click(2.5, (x, y), viewport, modelview, projection)
                 if event.type == MOUSEMOTION and not rotating:
                     lastPosX, lastPosY = event.pos
 
@@ -413,6 +560,10 @@ def main():
 
             glDisable(GL_TEXTURE_2D)
             draw_clouds(2.5, current_time)
+            
+            # Draw continent markers
+            for marker in continent_markers:
+                marker.draw(2.5)
 
             pygame.display.flip()
             pygame.time.wait(10)
